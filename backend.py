@@ -1,9 +1,24 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, abort
 import sqlite3
 import os
+import bleach
 
 app = Flask(__name__)
 DB = "c2.db"
+
+# Whitelist for allowed input tags (if any)
+ALLOWED_TAGS = []
+ALLOWED_ATTRS = {}
+
+MAX_COMMAND_LENGTH = 500
+MAX_NAME_LENGTH = 64
+MAX_OUTPUT_LENGTH = 8192
+
+def sanitize_input(value, max_length):
+    if not value:
+        return ""
+    clean = bleach.clean(value.strip(), tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
+    return clean[:max_length]
 
 def init_db():
     with sqlite3.connect(DB) as conn:
@@ -16,6 +31,7 @@ def init_db():
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             command TEXT
                         )''')
+        conn.commit()
 
 @app.route('/', methods=["GET"])
 def index():
@@ -25,9 +41,14 @@ def index():
 
 @app.route('/send_command', methods=["POST"])
 def send_command():
-    command = request.form.get("command")
+    raw_command = request.form.get("command", "")
+    command = sanitize_input(raw_command, MAX_COMMAND_LENGTH)
+    if not command:
+        abort(400, "Invalid command")
+
     with sqlite3.connect(DB) as conn:
         conn.execute("INSERT INTO commands (command) VALUES (?)", (command,))
+        conn.commit()
     return "Command sent. <a href='/'>Back</a>"
 
 @app.route('/get_command', methods=["GET"])
@@ -38,10 +59,18 @@ def get_command():
 
 @app.route('/submit_output', methods=["POST"])
 def submit_output():
-    name = request.form.get("name")
-    output = request.form.get("output")
+    raw_name = request.form.get("name", "")
+    raw_output = request.form.get("output", "")
+
+    name = sanitize_input(raw_name, MAX_NAME_LENGTH)
+    output = sanitize_input(raw_output, MAX_OUTPUT_LENGTH)
+
+    if not name or not output:
+        abort(400, "Missing or invalid name/output")
+
     with sqlite3.connect(DB) as conn:
         conn.execute("INSERT INTO bots (name, output) VALUES (?, ?)", (name, output))
+        conn.commit()
     return "OK"
 
 if __name__ == '__main__':
