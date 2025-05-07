@@ -6,10 +6,12 @@ A fancy, lightweight, and anonymous Command & Control (C2) panel built using Fla
 
 ## ✅ Features
 
-- ✨ Fancy Bootstrap 5 UI
-- 🧠 SQLite-based bot command/output tracking
+- ✨ Modern Bootstrap 5 UI with animations (Animate.css)
+- 🧠 SQLite-based command and response tracking
 - 🔐 Full C2 communication over I2P `.b32.i2p` addresses
 - 🕸️ Remote command dispatch and bot response capture
+- 🛡️ Input sanitization using `bleach` for security
+- 📱 Responsive and mobile-friendly design
 
 ---
 
@@ -21,11 +23,12 @@ A fancy, lightweight, and anonymous Command & Control (C2) panel built using Fla
 - Flask
 - SQLite3
 - `i2pd` (I2P router daemon)
+- `bleach` (for secure input filtering)
 
-### Install Flask
+### Install dependencies:
 
-```
-pip install flask
+```bash
+pip install flask bleach
 ````
 
 ---
@@ -34,13 +37,17 @@ pip install flask
 
 Clone and run:
 
-```
+```bash
 git clone https://github.com/yourname/i2p-c2-panel.git
 cd i2p-c2-panel
 python3 app.py
 ```
 
-The panel will run on `http://127.0.0.1:8080`
+Your panel will now be accessible locally at:
+
+```
+http://127.0.0.1:8080
+```
 
 ---
 
@@ -50,7 +57,7 @@ The panel will run on `http://127.0.0.1:8080`
 
 #### Install i2pd (Debian/Ubuntu):
 
-```
+```bash
 sudo apt install i2pd
 ```
 
@@ -65,29 +72,31 @@ inport = 80
 keys = c2.dat
 ```
 
-#### Start i2pd:
+#### Start the daemon:
 
-```
+```bash
 sudo systemctl start i2pd
 ```
 
-#### Check the I2P hostname:
+#### Check your I2P hostname:
 
-```
+```bash
 cat ~/.i2pd/c2.dat.b32.i2p
 ```
 
-Your panel will now be available at:
+You can now access the panel via:
 
 ```
 http://[c2name].b32.i2p
 ```
 
+> 📌 Note: Use an I2P-enabled browser or proxy to access `.b32.i2p` addresses.
+
 ---
 
 ## ✅ 4. Bot Communication Example
 
-Here’s an example Python bot that polls the C2 for commands and submits output.
+Here's an example Python bot that polls the C2 for commands and reports results:
 
 ```python
 import time, requests, subprocess
@@ -106,7 +115,7 @@ while True:
         time.sleep(60)
 ```
 
-**Note:** Configure your I2P proxy or local tunnels so that bots can resolve `.b32.i2p` addresses.
+🛡️ Ensure the bot can resolve `.b32.i2p` addresses through an I2P proxy or local tunnel.
 
 ---
 
@@ -115,20 +124,22 @@ while True:
 ```
 i2p-c2-panel/
 ├── app.py
-├── c2.db  (auto-created)
+├── c2.db               # Auto-created on first run
 └── templates/
-    └── index.html
+    └── index.html      # Bootstrap 5 + Animate.css UI
 ```
 
 ---
 
 ## ✅ 6. Summary
 
-| Component   | Purpose                         |
-| ----------- | ------------------------------- |
-| Flask       | Backend server and web UI       |
-| Bootstrap 5 | Fancy UI for control panel      |
-| SQLite      | Stores bot output + commands    |
-| I2P / i2pd  | Makes it accessible anonymously |
+| Component   | Purpose                          |
+| ----------- | -------------------------------- |
+| Flask       | Backend server and web interface |
+| Bootstrap 5 | Fancy responsive UI              |
+| Animate.css | Smooth UI animations             |
+| SQLite      | Store commands and outputs       |
+| bleach      | Secure input sanitization        |
+| I2P / i2pd  | Anonymous access via `.b32.i2p`  |
 
 ---
